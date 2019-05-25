@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">vision1</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="title_activity_login">login</string>
+    <string name="title_activity_register">register</string>
+    <string name="title_activity_model_show">model_show</string>
+</resources>
