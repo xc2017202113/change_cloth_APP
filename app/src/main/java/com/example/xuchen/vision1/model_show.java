@@ -122,14 +122,14 @@ public class model_show extends AppCompatActivity {
         myGLView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
         myGLView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
         myGLView.setZOrderOnTop(true);
-        myRenderer = new RenderView(this);
+        myRenderer = new RenderView(this,"tractor");
         myGLView.setRenderer(myRenderer);
         threadLoadModel=new Thread(new Runnable() {
 
             @Override
 
             public void run() {
-                myRenderer.addObject(model_show.this);
+                myRenderer.addObject(model_show.this,1024);
             }
 
         });

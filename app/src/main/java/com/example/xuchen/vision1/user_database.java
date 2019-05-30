@@ -19,6 +19,7 @@ public class user_database extends SQLiteOpenHelper {
         super(context,name,factory,version);
         mContext = context;
     }
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_USER);

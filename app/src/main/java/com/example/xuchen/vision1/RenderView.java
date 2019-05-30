@@ -33,9 +33,22 @@ public class RenderView implements GLSurfaceView.Renderer{
     public World myWorld;
     private FrameBuffer frameBuffer;
     private Object3D selectedObj;
-    public RenderView(Context context) {
+
+    String filename;
+    String objfilename;
+    String mtlfilename;
+    String texturefilename;
+
+    public RenderView(Context context,String Filename) {
         myWorld = new World();
         myWorld.setAmbientLight(25, 25, 25);
+
+        filename = Filename;
+        objfilename = Filename+".obj";
+        mtlfilename = Filename+".mtl";
+        texturefilename = Filename+"_texture";
+
+
         Light light = new Light(myWorld);
         light.setIntensity(250, 250, 250);
         light.setPosition(new SimpleVector(0, 0, -15));
@@ -43,77 +56,61 @@ public class RenderView implements GLSurfaceView.Renderer{
         cam.setFOVLimits(0.1f,2.0f);
         cam.setFOV(1.08f);
         cam.setYFOV(1.92f);
-
         cam.setClippingPlanes(0f,2000f);
-
         System.out.println(cam.getFOV());
-
         System.out.println(cam.getYFOV());
-
         System.out.println(cam.getPosition());
-
         String[] names=Config.getParameterNames();
-
         for(String i:names){
-
             System.out.println(i);
-
         }
-
-
 
     }
 
     public void onSurfaceChanged(GL10 gl, int w, int h) {
 
         if (frameBuffer != null) {
-
             frameBuffer.dispose();
-
         }
-
         frameBuffer = new FrameBuffer(gl, w, h);
-
     }
 
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-
         gl.glClearColor(1.0f,1.0f,1.0f,0.3f);
-
     }
 
     public void onDrawFrame(GL10 gl) {
-
         frameBuffer.clear(Color.TRANSPARENT);
-
         myWorld.renderScene(frameBuffer);
-
         myWorld.draw(frameBuffer);
         frameBuffer.display();
-
     }
 
-    public void addObject(Context context) {
+    public void addObject(Context context,int weight) {
 
         Object3D newObject = null;
 
         try {
 
-            createTextures(context);
+            createTextures(context,weight);
 
-            Object3D[] objectsArray2 = Loader.loadOBJ(context.getResources().getAssets().open("policecar.obj"), context.getResources()
+            //String obj_name = model_name+".obj";
+            //String mtl_name = model_name+".mtl";
+            //String texture_name = model_name+"_texture"
 
-                    .getAssets().open("policecar.mtl"), 1f);
+            Object3D[] objectsArray2 = Loader.loadOBJ(context.getResources().getAssets().open(objfilename), context.getResources()
+
+                    .getAssets().open(mtlfilename), 1f);
 
             newObject = Object3D.mergeAll(objectsArray2);
 
-            newObject.setTexture("policecar_texture");
+            newObject.setTexture(texturefilename);
 
             newObject.setOrigin(new SimpleVector(0, 0, 300));
 
             newObject.rotateZ(3.1415926f);
 
-            newObject.setName("policecar.obj");
+            newObject.setName(objfilename);
 
         } catch (IOException e) {
 
@@ -125,13 +122,9 @@ public class RenderView implements GLSurfaceView.Renderer{
         newObject.build();
 
         Message msg=new Message();
-
         msg.what=model_show.MSG_LOAD_MODEL_SUC;
-
         msg.obj=newObject;
-
         model_show.handler.sendMessage(msg);
-
         selectedObj=newObject;
 
     }
@@ -140,22 +133,19 @@ public class RenderView implements GLSurfaceView.Renderer{
 
         if (this.selectedObj != null) {
             SimpleVector objOrigin = this.selectedObj.getOrigin();
-
             SimpleVector currentPoition=this.selectedObj.getTransformedCenter();
-
             System.out.println(currentPoition);
-
-
-
             this.selectedObj.translate(incX, incY, incZ);
 
         }
 
     }
-    public Bitmap scaleBitmap(Bitmap bitmap){
+
+
+    public Bitmap scaleBitmap(Bitmap bitmap,int weight){
         int w = bitmap.getWidth();
         int h = bitmap.getHeight();
-        int destW = 1024;
+        int destW = weight;
         int destH = 512;
         Log.d(TAG, "createTextures:--------------------- "+w);
         Log.d(TAG, "createTextures:--------------------- "+destH);
@@ -163,19 +153,18 @@ public class RenderView implements GLSurfaceView.Renderer{
         return newbm;
     }
 
-    private void createTextures(Context context) {
+    private void createTextures(Context context,int weight) {
 
-        Bitmap bitmap=BitmapFactory.decodeResource(context.getResources(), R.drawable.logo);
+        Bitmap bitmap=BitmapFactory.decodeResource(context.getResources(), R.mipmap.policecar);
         Log.d(TAG, "createTextures: "+bitmap.getHeight());
-        Bitmap bitmap_scale = scaleBitmap(bitmap);
-        Log.d(TAG, "createTextures: "+bitmap_scale.getHeight());
+        Bitmap bitmap_scale = scaleBitmap(bitmap,weight);
+        //Log.d(TAG, "createTextures: "+bitmap_scale.getHeight());
         //bitmap.setHeight();
         Texture texture = new Texture(bitmap_scale);
-        if(!TextureManager.getInstance().containsTexture("policecar_texture")){
-            TextureManager.getInstance().addTexture("policecar_texture", texture);
+        if(!TextureManager.getInstance().containsTexture(texturefilename)){
+            TextureManager.getInstance().addTexture(texturefilename, texture);
         }
 
     }
 
 }
-
